@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { LayoutDashboard, UsersRound, Megaphone, SlidersHorizontal, ScrollText, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, UsersRound, Megaphone, SlidersHorizontal, ScrollText, ShieldCheck, ChartNoAxesCombined, UserCog, Activity } from "lucide-react";
 import type { ReactNode } from "react";
 
-type AdminSection = "overview" | "users" | "announcements" | "settings" | "audit-log";
+type AdminSection = "overview" | "users" | "announcements" | "settings" | "audit-log" | "analytics" | "admins" | "system-health";
 
 const navigation: { id: AdminSection; label: string; href: string; icon: typeof LayoutDashboard }[] = [
   { id: "overview", label: "Overview", href: "/", icon: LayoutDashboard },
@@ -10,6 +10,9 @@ const navigation: { id: AdminSection; label: string; href: string; icon: typeof 
   { id: "announcements", label: "Announcements", href: "/announcements", icon: Megaphone },
   { id: "settings", label: "App settings", href: "/settings", icon: SlidersHorizontal },
   { id: "audit-log", label: "Audit log", href: "/audit-log", icon: ScrollText },
+  { id: "analytics", label: "Analytics", href: "/analytics", icon: ChartNoAxesCombined },
+  { id: "admins", label: "Admin access", href: "/admins", icon: UserCog },
+  { id: "system-health", label: "System health", href: "/system-health", icon: Activity },
 ];
 
 export function AdminShell({ active, children }: { active: AdminSection; children: ReactNode }) {
