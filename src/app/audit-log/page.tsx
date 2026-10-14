@@ -13,7 +13,7 @@ export default async function AuditLogPage() {
     <AdminShell active="audit-log">
       <header className="topbar">
         <div><div className="eyebrow">Security / Accountability</div><h1>Audit log</h1><p className="subtle">A chronological record of administrative actions performed in the control panel.</p></div>
-        <Link className="button" href="/"><ArrowLeft size={14} aria-hidden="true" /> Overview</Link>
+        <div className="topbar-actions">{["owner","admin"].includes(admin.role) && <a className="button" href="/api/export/audit-log">Export CSV</a>}<Link className="button" href="/"><ArrowLeft size={14} aria-hidden="true" /> Overview</Link></div>
       </header>
 
       <section className="panel audit-panel">
@@ -21,7 +21,7 @@ export default async function AuditLogPage() {
           <div><h2 className="section-heading">Recent activity</h2><p className="section-description">Latest 100 recorded events, newest first.</p></div>
           <span className="count-label"><ShieldCheck size={14} aria-hidden="true" /> {data?.length ?? 0} EVENTS</span>
         </div>
-        {error ? <div className="notice">The audit log is unavailable. Apply the migration and confirm the table permissions.</div> : !data?.length ? (
+        <form className="search-form audit-search" role="search"><input className="field" name="action" defaultValue={action} placeholder="Filter actions, e.g. announcement or user.ban" aria-label="Filter audit actions" /><button className="button primary" type="submit">Filter</button>{action && <Link className="button" href="/audit-log">Clear</Link>}</form>\n        {error ? <div className="notice">The audit log is unavailable. Apply the migration and confirm the table permissions.</div> : !data?.length ? (
           <div className="empty-state"><ScrollText size={25} aria-hidden="true" /><strong>No events recorded</strong><span>Administrative actions will appear here when audit logging is triggered.</span></div>
         ) : (
           <div className="table-wrap"><table><thead><tr><th>Action</th><th>Target</th><th>Administrator</th><th>Timestamp</th></tr></thead><tbody>
