@@ -19,7 +19,7 @@ type DirectoryRow = Record<string, unknown> & {
 };
 
 export default async function UsersPage({ searchParams }: { searchParams: Promise<{ q?: string; status?: string; page?: string; error?: string; updated?: string }> }) {
-  const { supabase, user } = await requireAdmin();
+  const { supabase, user, admin } = await requireAdmin();
   const params = await searchParams;
   const q = (params.q ?? "").trim().slice(0, 120);
   const page = Math.max(1, Math.min(10000, Number.parseInt(params.page ?? "1", 10) || 1));
@@ -84,7 +84,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
           <h1>User management</h1>
           <p className="subtle">Search accounts, inspect email verification, and manage access with clear status and paginated results.</p>
         </div>
-        <div className="topbar-actions"><a className="button" href="/api/export/users">Export CSV</a><Link className="button" href="/"><ArrowLeft size={14} aria-hidden="true" /> Overview</Link></div>
+        <div className="topbar-actions">{["owner", "admin"].includes(admin.role) && <a className="button" href="/api/export/users">Export CSV</a>}<Link className="button" href="/"><ArrowLeft size={14} aria-hidden="true" /> Overview</Link></div>
       </header>
 
       {params.error && errors[params.error] && <div className="notice page-notice" role="alert"><ShieldAlert size={15} aria-hidden="true" />{errors[params.error]}</div>}
