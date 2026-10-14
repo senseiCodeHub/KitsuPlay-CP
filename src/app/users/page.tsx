@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Search, UsersRound, ArrowLeft, ShieldAlert, MailCheck, MailX } from "lucide-react";
+import { Search, UsersRound, ArrowLeft, ShieldAlert, MailCheck, MailX, ChevronLeft, ChevronRight, Ban, UserRoundCheck } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { requireAdmin } from "@/lib/auth/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -7,47 +7,73 @@ import { setUserBan } from "./actions";
 
 export const dynamic = "force-dynamic";
 
+const PAGE_SIZE = 50;
+
 type DirectoryRow = Record<string, unknown> & {
   id: string;
   email: string | null;
   created_at: string | null;
   email_confirmed_at: string | null;
+  last_sign_in_at: string | null;
+  banned_until: string | null;
 };
 
-export default async function UsersPage({ searchParams }: { searchParams: Promise<{ q?: string; error?: string; updated?: string }> }) {
+export default async function UsersPage({ searchParams }: { searchParams: Promise<{ q?: string; status?: string; page?: string; error?: string; updated?: string }> }) {
   const { supabase, user } = await requireAdmin();
   const params = await searchParams;
-  const q = params.q ?? "";
-  const { data: profileData, error: profileError } = await supabase.from("profiles").select("*").limit(100);
+  const q = (params.q ?? "").trim().slice(0, 120);
+  const page = Math.max(1, Math.min(10000, Number.parseInt(params.page ?? "1", 10) || 1));
+  const status = ["all", "verified", "unverified", "banned", "active"].includes(params.status ?? "") ? params.status ?? "all" : "all";
 
   let authUsers: DirectoryRow[] = [];
   let authError = false;
   try {
     const adminClient = createAdminClient();
-    const result = await adminClient.auth.admin.listUsers({ page: 1, perPage: 100 });
+    const result = await adminClient.auth.admin.listUsers({ page, perPage: PAGE_SIZE });
     if (result.error) authError = true;
     else authUsers = result.data.users.map((authUser) => ({
       id: authUser.id,
       email: authUser.email ?? null,
       created_at: authUser.created_at ?? null,
       email_confirmed_at: authUser.email_confirmed_at ?? null,
+      last_sign_in_at: authUser.last_sign_in_at ?? null,
+      banned_until: authUser.banned_until ?? null,
     }));
   } catch {
     authError = true;
   }
+
+  const { data: profileData, error: profileError } = authUsers.length
+    ? await supabase.from("profiles").select("*").in("id", authUsers.map((item) => item.id))
+    : { data: [], error: null };
 
   const profileById = new Map((profileData ?? []).map((row) => [String(row.id), row]));
   const rows: DirectoryRow[] = authUsers.map((authUser) => ({
     ...(profileById.get(authUser.id) ?? {}),
     ...authUser,
   }));
-  const term = q.trim().toLowerCase();
-  const filteredRows = rows.filter((row) => !term || Object.values(row).some((value) => String(value ?? "").toLowerCase().includes(term)));
+  const getName = (row: DirectoryRow) => String(row.username ?? row.display_name ?? row.full_name ?? (row.email ? row.email.split("@")[0] : "Unnamed member"));
+  const isBanned = (row: DirectoryRow) => Boolean(row.banned_until && Date.parse(row.banned_until) > Date.now());
+  const term = q.toLowerCase();
+  const filteredRows = rows.filter((row) => {
+    const matchesQuery = !term || [row.id, row.email, getName(row)].some((value) => String(value ?? "").toLowerCase().includes(term));
+    const banned = isBanned(row);
+    const verified = Boolean(row.email_confirmed_at);
+    const matchesStatus = status === "all" || (status === "verified" && verified) || (status === "unverified" && !verified) || (status === "banned" && banned) || (status === "active" && !banned);
+    return matchesQuery && matchesStatus;
+  });
   const errors: Record<string, string> = {
     invalid: "Invalid account or action.",
     self: "You cannot ban your own admin account.",
     config: "Set SUPABASE_SECRET_KEY in Vercel environment variables to enable Auth user management.",
     save: "The account status could not be changed. Check Supabase Auth permissions and configuration.",
+  };
+  const pageHref = (nextPage: number) => {
+    const query = new URLSearchParams();
+    query.set("page", String(nextPage));
+    if (q) query.set("q", q);
+    if (status !== "all") query.set("status", status);
+    return "/users?" + query.toString();
   };
 
   return (
@@ -56,7 +82,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
         <div>
           <div className="eyebrow">Directory / Members</div>
           <h1>User management</h1>
-          <p className="subtle">Review member access and verify each account’s email confirmation status from Supabase Auth.</p>
+          <p className="subtle">Search accounts, inspect email verification, and manage access with clear status and paginated results.</p>
         </div>
         <Link className="button" href="/"><ArrowLeft size={14} aria-hidden="true" /> Overview</Link>
       </header>
@@ -68,40 +94,51 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
 
       <section className="panel directory-panel">
         <div className="directory-heading">
-          <div><h2 className="section-heading">Member directory</h2><p className="section-description">Showing {filteredRows.length} matching accounts from up to 100 Auth users.</p></div>
-          <span className="count-label"><UsersRound size={14} aria-hidden="true" /> {filteredRows.length} RESULTS</span>
+          <div><h2 className="section-heading">Member directory</h2><p className="section-description">Page {page} · {filteredRows.length} matching accounts on this page, {PAGE_SIZE} loaded per request.</p></div>
+          <span className="count-label"><UsersRound size={14} aria-hidden="true" /> {filteredRows.length} MATCHES</span>
         </div>
         <form className="search-form" role="search">
-          <div className="search-input-wrap"><Search size={16} aria-hidden="true" /><input className="field" name="q" placeholder="Search email, name, or account ID…" defaultValue={q} aria-label="Search users" /></div>
-          <button className="button primary" type="submit">Search members</button>
-          {q && <Link className="button" href="/users">Clear</Link>}
+          <div className="search-input-wrap"><Search size={16} aria-hidden="true" /><input className="field" name="q" placeholder="Search this page by email, name, or ID…" defaultValue={q} aria-label="Search current page of users" /></div>
+          <select className="field status-filter" name="status" defaultValue={status} aria-label="Filter by account status">
+            <option value="all">All statuses</option><option value="verified">Email verified</option><option value="unverified">Email unverified</option><option value="banned">Banned accounts</option><option value="active">Active accounts</option>
+          </select>
+          <button className="button primary" type="submit">Apply</button>
+          {(q || status !== "all") && <Link className="button" href="/users">Clear</Link>}
         </form>
-        {authError ? <div className="empty-state"><UsersRound size={25} aria-hidden="true" /><strong>Auth directory unavailable</strong><span>Set the server-only Supabase secret key to read email verification status safely.</span></div> : filteredRows.length === 0 ? (
-          <div className="empty-state"><UsersRound size={25} aria-hidden="true" /><strong>No matching accounts</strong><span>Try another name, email, or account ID.</span></div>
+        {authError ? <div className="empty-state"><UsersRound size={25} aria-hidden="true" /><strong>Auth directory unavailable</strong><span>Set the server-only Supabase secret key to read email verification and account access safely.</span></div> : filteredRows.length === 0 ? (
+          <div className="empty-state"><UsersRound size={25} aria-hidden="true" /><strong>No matching accounts on this page</strong><span>Change the filter or move to another page. Search currently applies to the loaded page only.</span></div>
         ) : (
           <>
-            <p className="table-caption">Email status comes directly from Supabase Auth. A confirmed timestamp means the email verification completed; profile data is supplementary.</p>
-            <div className="table-wrap"><table><thead><tr><th>Member</th><th>Email</th><th>Email verification</th><th>Created</th><th>Account ID</th><th>Actions</th></tr></thead><tbody>
+            <p className="table-caption">Email verification is read directly from Supabase Auth. Account access status reflects the Auth ban expiry. Search and filters apply to the currently loaded page.</p>
+            <div className="table-wrap"><table><thead><tr><th>Member</th><th>Email</th><th>Email verification</th><th>Account status</th><th>Last sign-in</th><th>Created</th><th>Actions</th></tr></thead><tbody>
               {filteredRows.map((row) => {
                 const id = row.id;
                 const isSelf = id === user.id;
-                const displayName = String(row.username ?? row.display_name ?? row.full_name ?? (row.email ? String(row.email).split("@")[0] : "Unnamed member"));
+                const displayName = getName(row);
                 const confirmed = Boolean(row.email_confirmed_at);
+                const banned = isBanned(row);
                 return <tr key={id}>
                   <td><div className="member-cell"><span className="member-avatar">{displayName.slice(0, 1).toUpperCase()}</span><span><strong>{displayName}</strong><small>{isSelf ? "Your account" : "KitsuPlay member"}</small></span></div></td>
                   <td>{row.email ?? "—"}</td>
-                  <td><span className={confirmed ? "status-label status-live" : "status-label"}>{confirmed ? <MailCheck size={13} aria-hidden="true" /> : <MailX size={13} aria-hidden="true" />}{confirmed ? "Verified" : "Unverified"}</span>{confirmed && <small style={{ display: "block", color: "var(--muted-2)", marginTop: 5 }}>{new Date(String(row.email_confirmed_at)).toLocaleString()}</small>}</td>
-                  <td>{row.created_at ? new Date(String(row.created_at)).toLocaleDateString() : "—"}</td>
-                  <td><span className="id-cell" title={id}>{id.slice(0, 8)}…</span></td>
+                  <td><span className={confirmed ? "status-label status-live" : "status-label"}>{confirmed ? <MailCheck size={13} aria-hidden="true" /> : <MailX size={13} aria-hidden="true" />}{confirmed ? "Verified" : "Unverified"}</span>{confirmed && <small className="status-detail">{new Date(String(row.email_confirmed_at)).toLocaleDateString()}</small>}</td>
+                  <td><span className={banned ? "status-label status-banned" : "status-label status-live"}>{banned ? <Ban size={13} aria-hidden="true" /> : <UserRoundCheck size={13} aria-hidden="true" />}{banned ? "Banned" : "Active"}</span></td>
+                  <td>{row.last_sign_in_at ? new Date(row.last_sign_in_at).toLocaleDateString() : "Never"}</td>
+                  <td>{row.created_at ? new Date(row.created_at).toLocaleDateString() : "—"}</td>
                   <td><div className="table-actions">
-                    <form action={setUserBan}><input type="hidden" name="user_id" value={id} /><input type="hidden" name="action" value="ban" /><button className="button danger" type="submit" disabled={isSelf}>Ban</button></form>
-                    <form action={setUserBan}><input type="hidden" name="user_id" value={id} /><input type="hidden" name="action" value="unban" /><button className="button" type="submit" disabled={isSelf}>Unban</button></form>
+                    {banned
+                      ? <form action={setUserBan}><input type="hidden" name="user_id" value={id} /><input type="hidden" name="action" value="unban" /><button className="button" type="submit" disabled={isSelf}>Unban</button></form>
+                      : <form action={setUserBan}><input type="hidden" name="user_id" value={id} /><input type="hidden" name="action" value="ban" /><button className="button danger" type="submit" disabled={isSelf}>Ban</button></form>}
                   </div></td>
                 </tr>;
               })}
             </tbody></table></div>
           </>
         )}
+        <div className="pagination">
+          <Link className={"button" + (page <= 1 ? " button-muted" : "")} aria-disabled={page <= 1} tabIndex={page <= 1 ? -1 : undefined} href={page <= 1 ? "/users" : pageHref(page - 1)}><ChevronLeft size={14} aria-hidden="true" /> Previous</Link>
+          <span>Page {page}</span>
+          <Link className={"button" + (authUsers.length < PAGE_SIZE ? " button-muted" : "")} aria-disabled={authUsers.length < PAGE_SIZE} tabIndex={authUsers.length < PAGE_SIZE ? -1 : undefined} href={authUsers.length < PAGE_SIZE ? pageHref(page) : pageHref(page + 1)}>Next <ChevronRight size={14} aria-hidden="true" /></Link>
+        </div>
       </section>
     </AdminShell>
   );
