@@ -49,3 +49,29 @@ export async function removeAdminAccess(formData: FormData) {
   revalidatePath("/");
   redirect("/admins?updated=1");
 }
+
+
+export async function grantAdminAccess(formData: FormData) {
+  const { user, admin } = await requireAdmin();
+  if (admin.role !== "owner") redirect("/unauthorized?reason=owner");
+  const email = String(formData.get("email") ?? "").trim().toLowerCase().slice(0, 254);
+  const role = String(formData.get("role") ?? "support");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !["owner", "admin", "support"].includes(role)) redirect("/admins?error=invalid");
+  let client: ReturnType<typeof createAdminClient>;
+  try { client = createAdminClient(); } catch { redirect("/admins?error=config"); }
+  let match: { id: string; email?: string } | null = null;
+  for (let page = 1; page <= 100; page++) {
+    const result = await client.auth.admin.listUsers({ page, perPage: 100 });
+    if (result.error) redirect("/admins?error=config");
+    match = result.data.users.find((item) => (item.email ?? "").toLowerCase() === email) ?? null;
+    if (match || result.data.users.length < 100) break;
+  }
+  if (!match) redirect("/admins?error=notfound");
+  const { data: existing } = await client.from("admin_users").select("user_id").eq("user_id", match.id).maybeSingle();
+  if (existing) redirect("/admins?error=exists");
+  const { error } = await client.from("admin_users").insert({ user_id: match.id, role, is_active: true, created_by: user.id });
+  if (error) redirect("/admins?error=save");
+  await client.from("admin_audit_log").insert({ actor_id: user.id, action: "admin.role.grant", target_type: "admin_user", target_id: match.id, details: { email, role } });
+  revalidatePath("/admins"); revalidatePath("/");
+  redirect("/admins?updated=1");
+}
