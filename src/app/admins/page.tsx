@@ -28,7 +28,9 @@ export default async function AdminsPage({ searchParams }: { searchParams: Promi
   } catch { loadError = true; }
 
   const messages: Record<string, string> = {
-    invalid: "Invalid account or role selection.",\n    notfound: "No Supabase Auth user was found for that email. The user must sign up first.",\n    exists: "That account already has an administrator role.",
+    invalid: "Invalid account or role selection.",
+    notfound: "No Supabase Auth user was found for that email. The user must sign up first.",
+    exists: "That account already has an administrator role.",
     config: "Set SUPABASE_SECRET_KEY in Vercel and redeploy to manage admin roles.",
     self: "You cannot downgrade or remove your own owner access here.",
     lastowner: "The last active owner cannot be downgraded or removed.",
@@ -41,7 +43,8 @@ export default async function AdminsPage({ searchParams }: { searchParams: Promi
       {params.error && messages[params.error] && <div className="notice page-notice" role="alert"><ShieldAlert size={15} />{messages[params.error]}</div>}
       {params.updated && <div className="success-banner"><span className="dot" /> Administrator access updated.</div>}
       {loadError && <div className="notice page-notice">Could not load the complete admin directory. Confirm SUPABASE_SECRET_KEY and database access.</div>}
-      <section className="panel grant-admin-panel"><div><h2 className="section-heading">Grant administrator access</h2><p className="section-description">The email must belong to an existing Supabase Auth user. Grant only the minimum required role.</p></div><form action={grantAdminAccess} className="grant-admin-form"><label className="label">Registered user email<input className="field" type="email" name="email" maxLength={254} placeholder="person@example.com" required /></label><label className="label">Role<select className="field" name="role" defaultValue="support"><option value="support">Support</option><option value="admin">Admin</option><option value="owner">Owner</option></select></label><button className="button primary" type="submit">Grant access</button></form></section>\n      <section className="panel directory-panel">
+      <section className="panel grant-admin-panel"><div><h2 className="section-heading">Grant administrator access</h2><p className="section-description">The email must belong to an existing Supabase Auth user. Grant only the minimum required role.</p></div><form action={grantAdminAccess} className="grant-admin-form"><label className="label">Registered user email<input className="field" type="email" name="email" maxLength={254} placeholder="person@example.com" required /></label><label className="label">Role<select className="field" name="role" defaultValue="support"><option value="support">Support</option><option value="admin">Admin</option><option value="owner">Owner</option></select></label><button className="button primary" type="submit">Grant access</button></form></section>
+      <section className="panel directory-panel">
         <div className="directory-heading"><div><h2 className="section-heading">Current administrators</h2><p className="section-description">Owner can grant, change, disable, or revoke roles. The last active owner is protected.</p></div><span className="count-label"><UsersRound size={14} /> {records.length} ADMINS</span></div>
         {!records.length ? <div className="empty-state"><UserCog size={24} /><strong>No administrators found</strong><span>Check that the owner account has been inserted into admin_users.</span></div> :
           <div className="table-wrap"><table><thead><tr><th>Account</th><th>Role</th><th>Access</th><th>Granted</th><th>Update role</th><th>Revoke</th></tr></thead><tbody>
