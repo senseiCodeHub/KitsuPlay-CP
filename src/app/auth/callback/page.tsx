@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { CheckCircle2, CircleAlert, LoaderCircle, ShieldCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -84,11 +83,7 @@ export default function AuthCallbackPage() {
         <p className="subtle" style={{ marginTop: 14 }}>{message}</p>
         {email && <p className="verification-email">{email}</p>}
         {state === "error" && <p className="error" role="alert">For safety, this page never marks an account verified by itself. Supabase must confirm the email token first.</p>}
-        <div style={{ display: "grid", gap: 9, marginTop: 25 }}>
-          <Link className="button primary" href="https://kitsu-play-cp.vercel.app/login">{isSuccess ? "Admin sign-in" : "Open control panel"}</Link>
-          <a className="button" href="https://kitsu-play-cp.vercel.app/users">View user status (admin access required)</a>
-        </div>
-        <p className="verification-footnote">Verification is handled by Supabase Auth. The control panel only displays the confirmation status returned by Supabase.</p>
+        <p className="verification-footnote">{isSuccess ? "You can now return to the KitsuPlay app. Administrators can confirm the live status in Control Panel → User management." : "Verification is handled by Supabase Auth. This page never changes a verification flag directly; request a fresh email if the link cannot be completed."}</p>
       </section>
       <div className="login-page-footer"><span>KITSUPLAY / CONTROL PANEL</span><span>Secure email confirmation · Supabase Auth</span></div>
     </main>
