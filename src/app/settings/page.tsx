@@ -7,7 +7,7 @@ import { saveSettings } from "./actions";
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
-  const { supabase } = await requireAdmin();
+  const { supabase, admin } = await requireAdmin();
   const { data, error } = await supabase.from("app_settings").select("key,value").eq("key", "maintenance_mode").maybeSingle();
   const value = (data?.value ?? { enabled: false, message: "" }) as { enabled?: boolean; message?: string };
 
@@ -26,7 +26,7 @@ export default async function SettingsPage() {
           <div className="section-kicker">SERVICE CONTROLS</div>
           <h2 className="section-heading">Maintenance mode</h2>
           <p className="section-description">Use this when the app needs planned downtime. Save a clear message so your client can explain the interruption to users.</p>
-          <form action={saveSettings} className="form settings-form">
+          {admin.role === "support" ? <div className="notice">Support role has read-only access to service settings.</div> : <form action={saveSettings} className="form settings-form">
             <label className="maintenance-switch">
               <input type="checkbox" name="enabled" defaultChecked={Boolean(value.enabled)} />
               <span className="switch-copy"><strong>Enable maintenance mode</strong><small>Store this state in Supabase for the Flutter app to read.</small></span>
