@@ -24,11 +24,11 @@ KitsuPlay CP is a separate Next.js admin control panel for the KitsuPlay Flutter
 2. Copy `.env.example` to `.env.local`.
 3. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 4. Set `SUPABASE_SECRET_KEY` only if you want Auth user management/ban controls. It is server-only and must never be exposed in browser code.
-5. Run `supabase/migrations/20261014130000_kitsuplay_cp.sql` in Supabase SQL Editor.
-6. Create an admin user in Supabase Dashboard → Authentication → Users.
-7. Grant that user owner role in SQL Editor, replacing the UUID:
+5. Run `supabase/migrations/20261014130000_kitsuplay_cp.sql` in Supabase SQL Editor.\n6. Run `supabase/migrations/20261014140000_admin_console_features.sql` in Supabase SQL Editor to add indexes and least-privilege RLS for admin mutations.
+7. Create an admin user in Supabase Dashboard → Authentication → Users.
+8. Grant that user owner role in SQL Editor, replacing the UUID:
    `insert into public.admin_users(user_id, role, is_active) values ('AUTH_USER_UUID_HERE','owner',true);`
-8. Run `npm run dev` and open `http://localhost:3000`.
+9. Run `npm run dev` and open `http://localhost:3000`.
 
 ## Email verification setup (required for production)
 
@@ -55,6 +55,6 @@ Import `senseiCodeHub/KitsuPlay-CP` as a Next.js project. Add environment variab
 ## Important notes
 - Do not put Supabase secret/service-role keys in `NEXT_PUBLIC_*` variables or client components.
 - Public verification callback is not an admin route; it verifies only the one-time token issued by Supabase and displays the result. The user directory itself remains admin-protected.
-- This first version does not offer arbitrary profile editing or a full admin-role management screen.
+- Analytics registration bars inspect up to the newest 1,000 Auth accounts; high-volume projects may see sampled counts. Full active-user/retention analytics requires event tracking in the Flutter app.\n- User CSV export is capped at 10,000 Auth users per request. Audit CSV export is capped at 10,000 events.\n- Scheduled announcement timestamps are stored in UTC. The Flutter app should respect `starts_at` and `ends_at` when displaying announcements.
 - The Flutter app must read and enforce `maintenance_mode` if you want that setting to affect users.
 - Confirm existing table names/columns and RLS policies before deployment; the code changes in this repository have not been built or tested in a live environment from this session.
