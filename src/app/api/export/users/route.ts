@@ -3,7 +3,11 @@ import { requireAdmin } from "@/lib/auth/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
-const csv = (value: unknown) => '"' + String(value ?? "").replace(/"/g, '""').replace(/[\r\n]+/g, " ") + '"';
+const csv = (value: unknown) => {
+  const text = String(value ?? "").replace(/[\r\n]+/g, " ");
+  const safe = /^[=+@\-\t]/.test(text) ? "'" + text : text;
+  return '"' + safe.replace(/"/g, '""') + '"';
+};
 
 export async function GET() {
   const { admin, supabase, user } = await requireAdmin();
@@ -21,8 +25,9 @@ export async function GET() {
     }
     const header = ["id", "email", "created_at", "email_confirmed_at", "last_sign_in_at", "banned_until"];
     const body = [header, ...users.map((u) => header.map((key) => u[key as keyof typeof u]))].map((row) => row.map(csv).join(",")).join("\r\n");
-    const { data: actor } = await client.auth.getUser();
-    void actor;
+    await supabase.from("admin_audit_log").insert({ actor_id: user.id, action: "users.export", target_type: "auth_user", details: { rows: users.length, truncated } });
     return new NextResponse("\uFEFF" + body + "\r\n", { headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": 'attachment; filename="kitsuplay-users.csv"', "Cache-Control": "no-store", "X-Export-Truncated": String(truncated) } });
-  } catch { return NextResponse.json({ error: "User export is not configured. Check the server-only Supabase secret." }, { status: 503 }); }
+  } catch {
+    return NextResponse.json({ error: "User export is not configured. Check the server-only Supabase secret." }, { status: 503 });
+  }
 }
