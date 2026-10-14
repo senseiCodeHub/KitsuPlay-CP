@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Search, UserRoundSearch, ArrowLeft, ShieldAlert } from "lucide-react";
+import { Search, UsersRound, ArrowLeft, ShieldAlert } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { requireAdmin } from "@/lib/auth/admin";
 import { setUserBan } from "./actions";
@@ -37,7 +37,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
       <section className="panel directory-panel">
         <div className="directory-heading">
           <div><h2 className="section-heading">Member directory</h2><p className="section-description">Showing {rows.length} matching profiles from up to 100 loaded records.</p></div>
-          <span className="count-label"><UserRoundSearch size={14} aria-hidden="true" /> {rows.length} RESULTS</span>
+          <span className="count-label"><UsersRound size={14} aria-hidden="true" /> {rows.length} RESULTS</span>
         </div>
         <form className="search-form" role="search">
           <div className="search-input-wrap"><Search size={16} aria-hidden="true" /><input className="field" name="q" placeholder="Search profile fields…" defaultValue={q} aria-label="Search profiles" /></div>
@@ -45,7 +45,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
           {q && <Link className="button" href="/users">Clear</Link>}
         </form>
         {error ? <div className="notice">Could not read profiles. Confirm the profiles schema and authenticated-user RLS policies.</div> : rows.length === 0 ? (
-          <div className="empty-state"><UserRoundSearch size={25} aria-hidden="true" /><strong>No matching profiles</strong><span>Try another name, email, or profile ID.</span></div>
+          <div className="empty-state"><UsersRound size={25} aria-hidden="true" /><strong>No matching profiles</strong><span>Try another name, email, or profile ID.</span></div>
         ) : (
           <>
             <p className="table-caption">Account access actions apply to the matching Supabase Auth user ID. Your own account cannot be banned here.</p>
