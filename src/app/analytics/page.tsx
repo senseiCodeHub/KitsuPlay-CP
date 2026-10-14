@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, UsersRound, Bookmark, History, UserPlus, TrendingUp, Activity } from "lucide-react";
+import { ArrowLeft, UsersRound, Bookmark, History, TrendingUp, Activity } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { requireAdmin } from "@/lib/auth/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
