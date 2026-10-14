@@ -15,7 +15,7 @@ export default async function SystemHealthPage() {
   const tableNames = ["profiles", "watchlist", "watch_progress", "admin_users", "app_settings", "app_announcements", "admin_audit_log"];
   const tableResults = await Promise.all(tableNames.map(async (table) => {
     try {
-      const result = await supabase.from(table).select("*", { head: true, count: "exact" }).limit(0);
+      const result = await supabase.from(table).select("id", { head: true }).limit(0);
       return { table, ok: !result.error, detail: result.error ? "Query failed or access is restricted; review table existence and RLS." : "Query succeeded." };
     } catch { return { table, ok: false, detail: "Query failed; review environment and database availability." }; }
   }));
