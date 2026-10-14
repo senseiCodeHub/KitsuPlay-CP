@@ -94,3 +94,24 @@ on conflict (key) do nothing;
 -- Create an Auth user first, then grant owner access by running:
 -- insert into public.admin_users(user_id,role,is_active)
 -- values ('AUTH_USER_UUID_HERE','owner',true);
+
+-- Allow active admins to inspect app records even when normal users are restricted by RLS.
+-- This block is conditional so the migration can run before optional app tables exist.
+do $$
+begin
+  if to_regclass('public.profiles') is not null then
+    execute 'alter table public.profiles enable row level security';
+    execute 'drop policy if exists "admins can read all profiles" on public.profiles';
+    execute 'create policy "admins can read all profiles" on public.profiles for select to authenticated using (public.kitsuplay_is_admin())';
+  end if;
+  if to_regclass('public.watchlist') is not null then
+    execute 'alter table public.watchlist enable row level security';
+    execute 'drop policy if exists "admins can read all watchlist" on public.watchlist';
+    execute 'create policy "admins can read all watchlist" on public.watchlist for select to authenticated using (public.kitsuplay_is_admin())';
+  end if;
+  if to_regclass('public.watch_progress') is not null then
+    execute 'alter table public.watch_progress enable row level security';
+    execute 'drop policy if exists "admins can read all watch progress" on public.watch_progress';
+    execute 'create policy "admins can read all watch progress" on public.watch_progress for select to authenticated using (public.kitsuplay_is_admin())';
+  end if;
+end $$;
