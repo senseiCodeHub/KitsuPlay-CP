@@ -18,7 +18,7 @@ export default async function SettingsPage() {
         <Link className="button" href="/"><ArrowLeft size={14} aria-hidden="true" /> Overview</Link>
       </header>
 
-      {error && <div className="notice page-notice" role="alert">Settings could not be loaded. Apply the Supabase SQL migration and verify RLS.</div>}
+      {error && <div className="notice page-notice" role="alert">Settings could not be loaded. Apply the Supabase SQL migration and verify RLS.</div>}\n      {params.error && <div className="notice page-notice" role="alert">Settings could not be saved. Check the database policy and try again.</div>}\n      {params.saved && <div className="success-banner"><span className="dot" /> Settings saved successfully.</div>}
 
       <section className="settings-layout">
         <div className="panel settings-main">
