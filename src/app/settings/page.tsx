@@ -6,8 +6,9 @@ import { saveSettings } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-export default async function SettingsPage() {
+export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string }> }) {
   const { supabase, admin } = await requireAdmin();
+  const params = await searchParams;
   const { data, error } = await supabase.from("app_settings").select("key,value").eq("key", "maintenance_mode").maybeSingle();
   const value = (data?.value ?? { enabled: false, message: "" }) as { enabled?: boolean; message?: string };
 
@@ -18,7 +19,9 @@ export default async function SettingsPage() {
         <Link className="button" href="/"><ArrowLeft size={14} aria-hidden="true" /> Overview</Link>
       </header>
 
-      {error && <div className="notice page-notice" role="alert">Settings could not be loaded. Apply the Supabase SQL migration and verify RLS.</div>}\n      {params.error && <div className="notice page-notice" role="alert">Settings could not be saved. Check the database policy and try again.</div>}\n      {params.saved && <div className="success-banner"><span className="dot" /> Settings saved successfully.</div>}
+      {error && <div className="notice page-notice" role="alert">Settings could not be loaded. Apply the Supabase SQL migration and verify RLS.</div>}
+      {params.error && <div className="notice page-notice" role="alert">Settings could not be saved. Check the database policy and try again.</div>}
+      {params.saved && <div className="success-banner"><span className="dot" /> Settings saved successfully.</div>}
 
       <section className="settings-layout">
         <div className="panel settings-main">
