@@ -1,0 +1,7 @@
+import Link from "next/link";
+import { signIn } from "./actions";
+const messages:Record<string,string>={missing:"Enter both email and password.",credentials:"Email or password is incorrect.",notadmin:"This account does not have active admin access."};
+export default async function LoginPage({searchParams}:{searchParams:Promise<{error?:string}>}){
+ const {error}=await searchParams;
+ return <main className="login-wrap"><section className="panel login-card"><Link className="brand" href="/"><span className="brand-mark">K</span><span>KitsuPlay <span style={{color:"#91a8ff"}}>CP</span></span></Link><div className="eyebrow" style={{marginTop:32}}>Secure administrator sign-in</div><h1 style={{fontSize:29,marginBottom:8}}>Welcome back</h1><p className="subtle">Sign in with an account that has explicitly been granted admin access.</p>{error&&messages[error]&&<p className="error" role="alert">{messages[error]}</p>}<form className="form" action={signIn} style={{marginTop:24}}><label className="label">Email address<input className="field" type="email" name="email" autoComplete="username" required/></label><label className="label">Password<input className="field" type="password" name="password" autoComplete="current-password" required/></label><button className="button primary" type="submit">Sign in to control panel</button></form><p className="subtle" style={{fontSize:12,marginTop:20}}>Public sign-up is intentionally disabled. Admin access is managed in Supabase.</p></section></main>;
+}
