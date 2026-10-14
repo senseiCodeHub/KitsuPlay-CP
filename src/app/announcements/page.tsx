@@ -36,7 +36,7 @@ export default async function AnnouncementsPage({ searchParams }: { searchParams
             <label className="label">Expires at (UTC, optional)<input className="field" type="datetime-local" name="ends_at" /><small className="form-help">Use UTC time. After this time, the app should no longer display the announcement.</small></label>
             <label className="publish-toggle"><input type="checkbox" name="is_active" /><span><strong>Enable announcement</strong><small>Scheduled announcements only become visible inside their start/end window.</small></span></label>
             <button className="button primary submit-wide" type="submit"><Send size={14} aria-hidden="true" /> Save announcement</button>
-          </form>
+          </form>}
         </div>
 
         <div className="panel announcement-list">
