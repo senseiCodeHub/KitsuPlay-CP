@@ -12,10 +12,18 @@ export default async function SystemHealthPage() {
   checks.push({ title: "Supabase public URL", detail: process.env.NEXT_PUBLIC_SUPABASE_URL ? "Environment variable is configured." : "NEXT_PUBLIC_SUPABASE_URL is missing.", ok: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL), severity: "error" });
   checks.push({ title: "Public client key", detail: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ? "Publishable key is configured." : "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY is missing.", ok: Boolean(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY), severity: "error" });
   checks.push({ title: "Server secret", detail: process.env.SUPABASE_SECRET_KEY ? "Server-only secret is configured; its value is never displayed." : "Auth admin functions and administrator directory require SUPABASE_SECRET_KEY.", ok: Boolean(process.env.SUPABASE_SECRET_KEY), severity: "warning" });
-  const tableNames = ["profiles", "watchlist", "watch_progress", "admin_users", "app_settings", "app_announcements", "admin_audit_log"];
-  const tableResults = await Promise.all(tableNames.map(async (table) => {
+  const tableProbes = [
+    { table: "profiles", column: "id" },
+    { table: "watchlist", column: "user_id" },
+    { table: "watch_progress", column: "user_id" },
+    { table: "admin_users", column: "user_id" },
+    { table: "app_settings", column: "key" },
+    { table: "app_announcements", column: "id" },
+    { table: "admin_audit_log", column: "id" },
+  ];
+  const tableResults = await Promise.all(tableProbes.map(async ({ table, column }) => {
     try {
-      const result = await supabase.from(table).select("id", { head: true }).limit(0);
+      const result = await supabase.from(table).select(column, { head: true }).limit(0);
       return { table, ok: !result.error, detail: result.error ? "Query failed or access is restricted; review table existence and RLS." : "Query succeeded." };
     } catch { return { table, ok: false, detail: "Query failed; review environment and database availability." }; }
   }));
