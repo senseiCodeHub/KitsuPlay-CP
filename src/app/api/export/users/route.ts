@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 const csv = (value: unknown) => '"' + String(value ?? "").replace(/"/g, '""').replace(/[\r\n]+/g, " ") + '"';
 
 export async function GET() {
-  const { admin } = await requireAdmin();
+  const { admin, supabase, user } = await requireAdmin();
   if (!["owner", "admin"].includes(admin.role)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   try {
     const client = createAdminClient();
