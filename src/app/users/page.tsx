@@ -84,7 +84,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
           <h1>User management</h1>
           <p className="subtle">Search accounts, inspect email verification, and manage access with clear status and paginated results.</p>
         </div>
-        <Link className="button" href="/"><ArrowLeft size={14} aria-hidden="true" /> Overview</Link>
+        <div className="topbar-actions"><a className="button" href="/api/export/users">Export CSV</a><Link className="button" href="/"><ArrowLeft size={14} aria-hidden="true" /> Overview</Link></div>
       </header>
 
       {params.error && errors[params.error] && <div className="notice page-notice" role="alert"><ShieldAlert size={15} aria-hidden="true" />{errors[params.error]}</div>}
