@@ -18,13 +18,14 @@ export default async function AdminsPage({ searchParams }: { searchParams: Promi
   let loadError = false;
   try {
     const client = createAdminClient();
-    const [admins, auth] = await Promise.all([
-      client.from("admin_users").select("user_id,role,is_active,created_at,created_by").order("created_at", { ascending: true }),
-      client.auth.admin.listUsers({ page: 1, perPage: 100 }),
-    ]);
-    if (admins.error || auth.error) loadError = true;
+    const admins = await client.from("admin_users").select("user_id,role,is_active,created_at,created_by").order("created_at", { ascending: true });
+    if (admins.error) loadError = true;
     records = admins.data ?? [];
-    emails = new Map((auth.data?.users ?? []).map((item) => [item.id, item.email ?? "No email"]));
+    const users = await Promise.all(records.map(async (record) => {
+      const result = await client.auth.admin.getUserById(record.user_id);
+      return [record.user_id, result.data.user?.email ?? "Auth user not found"] as const;
+    }));
+    emails = new Map(users);
   } catch { loadError = true; }
 
   const messages: Record<string, string> = {
