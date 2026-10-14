@@ -15,8 +15,8 @@ export default async function AnalyticsPage() {
     supabase.from("app_announcements").select("id", { count: "exact", head: true }).eq("is_active", true),
   ]);
   const days = Array.from({ length: 7 }, (_, index) => {
-    const date = new Date(); date.setHours(0,0,0,0); date.setDate(date.getDate() - (6-index));
-    return { key: date.toISOString().slice(0,10), label: date.toLocaleDateString(undefined,{weekday:"short"}), count: 0 };
+    const date = new Date(); date.setUTCHours(0,0,0,0); date.setUTCDate(date.getUTCDate() - (6-index));
+    return { key: date.toISOString().slice(0,10), label: date.toLocaleDateString(undefined,{weekday:"short",timeZone:"UTC"}), count: 0 };
   });
   let sampled = false;
   let authUnavailable = false;
