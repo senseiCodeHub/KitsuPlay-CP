@@ -19,7 +19,7 @@ language sql
 stable
 security invoker
 set search_path = public
-as $
+as $$
   select exists (
     select 1 from public.admin_users
     where user_id = (select auth.uid())
@@ -36,7 +36,7 @@ language sql
 stable
 security invoker
 set search_path = public
-as $
+as $$
   select exists (
     select 1 from public.admin_users
     where user_id = (select auth.uid())
