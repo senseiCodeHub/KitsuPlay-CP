@@ -29,7 +29,7 @@ export async function saveAdminRole(formData: FormData) {
     if (error) redirect("/admins?error=save");
     if ((count ?? 0) <= 1) redirect("/admins?error=lastowner");
   }
-  const payload = target
+  const payload: { user_id: string; role: string; is_active: boolean; created_by?: string } = target
     ? { user_id: userId, role, is_active: active }
     : { user_id: userId, role, is_active: active, created_by: user.id };
   const { error } = await client.from("admin_users").upsert(payload, { onConflict: "user_id" });
