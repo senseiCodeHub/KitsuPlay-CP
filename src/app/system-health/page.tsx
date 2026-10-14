@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Activity, CheckCircle2, CircleAlert, Database, KeyRound, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Activity, CheckCircle2, CircleAlert, Database, ShieldCheck } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { requireAdmin } from "@/lib/auth/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
