@@ -26,8 +26,9 @@ KitsuPlay CP is a separate Next.js admin control panel for the KitsuPlay Flutter
 4. Set `SUPABASE_SECRET_KEY` only if you want Auth user management/ban controls. It is server-only and must never be exposed in browser code.
 5. Run `supabase/migrations/20261014130000_kitsuplay_cp.sql` in Supabase SQL Editor.\n6. Run `supabase/migrations/20261014140000_admin_console_features.sql` in Supabase SQL Editor to add indexes and least-privilege RLS for admin mutations.
 7. Create an admin user in Supabase Dashboard → Authentication → Users.
-8. Grant that user owner role in SQL Editor, replacing the UUID:
-   `insert into public.admin_users(user_id, role, is_active) values ('AUTH_USER_UUID_HERE','owner',true);`
+8. Grant the intended trusted account owner access in SQL Editor. If the account already exists in `admin_users`, update it instead of inserting a duplicate:
+   `insert into public.admin_users(user_id, role, is_active) values ('AUTH_USER_UUID_HERE','owner',true) on conflict (user_id) do update set role = 'owner', is_active = true;`
+   Replace the UUID using the intended account in Authentication → Users. Do not promote an account you do not control.
 9. Run `npm run dev` and open `http://localhost:3000`.
 
 ## Email verification setup (required for production)
