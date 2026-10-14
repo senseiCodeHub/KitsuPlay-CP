@@ -1,7 +1,40 @@
 import Link from "next/link";
+import { ArrowLeft, ScrollText, ShieldCheck, Clock3 } from "lucide-react";
+import { AdminShell } from "@/components/admin-shell";
 import { requireAdmin } from "@/lib/auth/admin";
-export const dynamic="force-dynamic";
-export default async function AuditLogPage(){
- const {supabase}=await requireAdmin();const {data,error}=await supabase.from("admin_audit_log").select("id,actor_id,action,target_type,target_id,created_at").order("created_at",{ascending:false}).limit(100);
- return <div className="shell"><aside className="sidebar"><Link className="brand" href="/"><span className="brand-mark">K</span>KitsuPlay CP</Link><nav className="nav"><Link href="/">Overview</Link><Link href="/users">Users</Link><Link href="/announcements">Announcements</Link><Link href="/settings">App settings</Link><Link className="active" href="/audit-log">Audit log</Link></nav></aside><main className="main"><div className="topbar"><div><div className="eyebrow">Security</div><h1>Audit log</h1><p className="subtle">Latest administrative actions, newest first.</p></div><Link className="button" href="/">Dashboard</Link></div><section className="panel"><div className="table-wrap"><table><thead><tr><th>Action</th><th>Target</th><th>Admin ID</th><th>Time</th></tr></thead><tbody>{error?<tr><td colSpan={4}>Audit log table unavailable. Apply migration.</td></tr>:!data?.length?<tr><td colSpan={4}>No actions recorded yet.</td></tr>:data.map(row=><tr key={row.id}><td>{row.action}</td><td>{row.target_type??"—"} {row.target_id??""}</td><td>{row.actor_id??"System"}</td><td>{new Date(row.created_at).toLocaleString()}</td></tr>)}</tbody></table></div></section></main></div>;
+
+export const dynamic = "force-dynamic";
+
+export default async function AuditLogPage() {
+  const { supabase } = await requireAdmin();
+  const { data, error } = await supabase.from("admin_audit_log").select("id,actor_id,action,target_type,target_id,created_at").order("created_at", { ascending: false }).limit(100);
+
+  return (
+    <AdminShell active="audit-log">
+      <header className="topbar">
+        <div><div className="eyebrow">Security / Accountability</div><h1>Audit log</h1><p className="subtle">A chronological record of administrative actions performed in the control panel.</p></div>
+        <Link className="button" href="/"><ArrowLeft size={14} aria-hidden="true" /> Overview</Link>
+      </header>
+
+      <section className="panel audit-panel">
+        <div className="directory-heading">
+          <div><h2 className="section-heading">Recent activity</h2><p className="section-description">Latest 100 recorded events, newest first.</p></div>
+          <span className="count-label"><ShieldCheck size={14} aria-hidden="true" /> {data?.length ?? 0} EVENTS</span>
+        </div>
+        {error ? <div className="notice">The audit log is unavailable. Apply the migration and confirm the table permissions.</div> : !data?.length ? (
+          <div className="empty-state"><ScrollText size={25} aria-hidden="true" /><strong>No events recorded</strong><span>Administrative actions will appear here when audit logging is triggered.</span></div>
+        ) : (
+          <div className="table-wrap"><table><thead><tr><th>Action</th><th>Target</th><th>Administrator</th><th>Timestamp</th></tr></thead><tbody>
+            {data.map((row) => <tr key={row.id}>
+              <td><span className="action-label">{String(row.action).replaceAll("_", " ")}</span></td>
+              <td><span className="audit-target">{row.target_type ?? "—"}</span><span className="audit-target-id">{row.target_id ?? "No target ID"}</span></td>
+              <td><span className="id-cell" title={row.actor_id ?? ""}>{row.actor_id ? String(row.actor_id).slice(0, 8) + "…" : "System"}</span></td>
+              <td><span className="time-cell"><Clock3 size={12} aria-hidden="true" />{new Date(row.created_at).toLocaleString()}</span></td>
+            </tr>)}
+          </tbody></table></div>
+        )}
+      </section>
+      <p className="audit-footnote"><ShieldCheck size={13} aria-hidden="true" /> Audit records are intended for review; this page does not modify or delete events.</p>
+    </AdminShell>
+  );
 }
