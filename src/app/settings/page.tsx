@@ -1,0 +1,9 @@
+import Link from "next/link";
+import { requireAdmin } from "@/lib/auth/admin";
+import { saveSettings } from "./actions";
+export const dynamic="force-dynamic";
+export default async function SettingsPage(){
+ const {supabase}=await requireAdmin();const {data,error}=await supabase.from("app_settings").select("key,value").eq("key","maintenance_mode").maybeSingle();
+ const value=(data?.value??{enabled:false,message:""}) as {enabled?:boolean;message?:string};
+ return <div className="shell"><aside className="sidebar"><Link className="brand" href="/"><span className="brand-mark">K</span>KitsuPlay CP</Link><nav className="nav"><Link href="/">Overview</Link><Link href="/users">Users</Link><Link href="/announcements">Announcements</Link><Link className="active" href="/settings">App settings</Link><Link href="/audit-log">Audit log</Link></nav></aside><main className="main"><div className="topbar"><div><div className="eyebrow">Configuration</div><h1>App settings</h1><p className="subtle">Control maintenance messaging for the application.</p></div><Link className="button" href="/">Dashboard</Link></div>{error&&<div className="notice">Could not load settings. Apply the Supabase SQL migration and verify RLS.</div>}<section className="panel"><div className="panel-title">Maintenance mode</div><form action={saveSettings} className="form"><label className="label" style={{display:"flex",alignItems:"center",gap:9}}><input type="checkbox" name="enabled" defaultChecked={Boolean(value.enabled)}/> Enable maintenance mode</label><label className="label">Message shown to users<textarea className="field" name="message" rows={4} maxLength={1000} defaultValue={value.message??""}/></label><button className="button primary" type="submit">Save settings</button></form><p className="subtle">This saves configuration in Supabase. Your Flutter app must read and enforce this setting for maintenance mode to affect users.</p></section></main></div>;
+}
