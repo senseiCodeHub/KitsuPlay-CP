@@ -5,7 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export const dynamic = "force-dynamic";
 const csv = (value: unknown) => {
   const text = String(value ?? "").replace(/[\r\n]+/g, " ");
-  const safe = /^[=+@\-\t]/.test(text) ? "'" + text : text;
+  const safe = /^[=+\-@\t\r]/.test(text) ? "'" + text : text;
   return '"' + safe.replace(/"/g, '""') + '"';
 };
 
