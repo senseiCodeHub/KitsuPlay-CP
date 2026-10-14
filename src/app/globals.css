@@ -152,7 +152,7 @@ td .button{min-height:30px;padding:6px 9px;font-size:11px}
 .count-label{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:5px;padding:7px 9px;color:#aab6ac;font-size:9px;font-weight:800;letter-spacing:.09em;white-space:nowrap}
 .count-label svg{color:var(--accent)}
 .search-form{display:flex;gap:8px;margin-bottom:15px}
-.search-input-wrap{display:flex;align-items:center;gap:9px;flex:1;min-width:0}
+.search-input-wrap{position:relative;display:flex;align-items:center;gap:9px;flex:1;min-width:0}
 .search-input-wrap svg{position:absolute;margin-left:12px;color:var(--muted-2);pointer-events:none}
 .search-input-wrap .field{padding-left:37px}
 .table-caption{font-size:10px;color:var(--muted-2);margin:0 0 10px}
