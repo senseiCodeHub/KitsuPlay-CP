@@ -13,13 +13,30 @@ create index if not exists admin_users_role_active_idx
 -- requires the Flutter app to emit events; current admin analytics uses live counts and Auth signups.
 
 -- Enforce least privilege in RLS as well as in the UI/server actions.
+create or replace function public.kitsuplay_is_admin()
+returns boolean
+language sql
+stable
+security invoker
+set search_path = public
+as $
+  select exists (
+    select 1 from public.admin_users
+    where user_id = (select auth.uid())
+      and is_active = true
+      and role in ('owner','admin','support')
+  );
+$;
+revoke all on function public.kitsuplay_is_admin() from public;
+grant execute on function public.kitsuplay_is_admin() to authenticated;
+
 create or replace function public.kitsuplay_is_manager()
 returns boolean
 language sql
 stable
-security definer
+security invoker
 set search_path = public
-as $$
+as $
   select exists (
     select 1 from public.admin_users
     where user_id = (select auth.uid())
