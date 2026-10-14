@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function UnauthorizedPage(){return <main className="login-wrap"><section className="panel login-card"><div className="eyebrow">403 · Access denied</div><h1>Admin access required</h1><p className="subtle">Your account is signed in, but it has not been granted an active KitsuPlay control-panel role.</p><Link className="button" href="/login">Return to sign in</Link></section></main>;}
