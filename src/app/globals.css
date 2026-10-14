@@ -226,3 +226,19 @@ td .button{min-height:30px;padding:6px 9px;font-size:11px}
 @media(max-width:1050px){.announcement-grid{grid-template-columns:1fr}.settings-layout{grid-template-columns:1fr}.settings-aside{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.directory-panel,.announcement-list,.settings-main,.audit-panel{padding:15px}.directory-heading{align-items:flex-start;flex-direction:column;gap:10px}.search-form{flex-wrap:wrap}.search-input-wrap{flex-basis:100%}.search-form>.button{flex:1}.announcement-grid{gap:10px}.settings-aside{grid-template-columns:1fr}.maintenance-switch{align-items:flex-start}.mode-status{margin-left:auto}.table-caption{line-height:1.6}}
 @media(max-width:420px){.count-label{font-size:8px}.maintenance-switch{flex-wrap:wrap}.mode-status{margin-left:28px}.announcement-item-top{align-items:flex-start}.announcement-item-footer .button{font-size:10px}}
+
+.login-card{position:relative}
+.login-topline{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:28px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.login-security{display:inline-flex;align-items:center;gap:7px;color:var(--accent);font-size:9px;font-weight:850;letter-spacing:.12em}
+.login-version{color:var(--muted-2);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px}
+.login-brand{margin-bottom:36px}
+.login-card .eyebrow{margin-top:0!important}
+.login-card h1{max-width:320px}
+.login-form{margin-top:25px}
+.login-form .button{justify-content:space-between;padding-inline:14px}
+.login-error{border:1px solid #6b3b38;background:#2d1c1b;border-radius:6px;padding:10px 12px;margin:16px 0 -6px}
+.login-footnote{display:flex;align-items:flex-start;gap:9px;border-top:1px solid var(--line);padding-top:16px;margin-top:24px;color:var(--muted-2);font-size:10px;line-height:1.65}
+.login-footnote svg{color:var(--accent);flex:none;margin-top:1px}
+.login-page-footer{position:absolute;bottom:20px;left:28px;right:28px;display:flex;justify-content:space-between;gap:15px;color:#68766b;font-size:9px;letter-spacing:.05em}
+.login-page-footer span:first-child{font-weight:850;letter-spacing:.13em}
+@media(max-width:760px){.login-page-footer{position:relative;left:auto;right:auto;bottom:auto;flex-direction:column;align-items:center;margin-top:24px;text-align:center}.login-brand{margin-bottom:28px}}
