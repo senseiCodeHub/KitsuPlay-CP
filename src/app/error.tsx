@@ -1,13 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 
 export default function AdminError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
-  useEffect(() => {
-    // Keep the UI stable; production errors are intentionally not rendered to users.
-  }, []);
-
   return (
     <main className="login-wrap">
       <section className="panel login-card error-card" role="alert">
