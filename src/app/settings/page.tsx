@@ -38,7 +38,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             <label className="label">Maintenance message<textarea className="field" name="message" rows={5} maxLength={1000} placeholder="Tell users what is happening and when to try again." defaultValue={value.message ?? ""} /></label>
             <div className="form-help">Maximum 1,000 characters. Your Flutter app must read and enforce this setting for maintenance mode to affect users.</div>
             <button className="button primary submit-wide" type="submit"><Save size={14} aria-hidden="true" /> Save settings</button>
-          </form>
+          </form>}
         </div>
 
         <aside className="settings-aside">
