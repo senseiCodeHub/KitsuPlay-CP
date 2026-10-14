@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 export async function setUserBan(formData:FormData){
- const {supabase,user}=await requireAdmin();const userId=String(formData.get("user_id")??"");const action=String(formData.get("action")??"");
+ const {supabase,user,admin}=await requireAdmin();\n if(admin.role==="support")redirect("/unauthorized");const userId=String(formData.get("user_id")??"");const action=String(formData.get("action")??"");
  if(!/^[0-9a-f-]{36}$/i.test(userId)||!["ban","unban"].includes(action))redirect("/users?error=invalid");
  if(userId===user.id)redirect("/users?error=self");
  let adminClient: ReturnType<typeof createAdminClient>;
