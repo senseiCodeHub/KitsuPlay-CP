@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Megaphone, Send, Clock3 } from "lucide-react";
+import { ArrowLeft, Megaphone, Send, Clock } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { requireAdmin } from "@/lib/auth/admin";
 import { createAnnouncement, toggleAnnouncement } from "./actions";
@@ -46,7 +46,7 @@ export default async function AnnouncementsPage({ searchParams }: { searchParams
               <div className="announcement-item-top"><span className={"kind-label kind-" + item.kind}>{item.kind}</span><span className={item.is_active ? "status-label status-live" : "status-label"}><span />{item.is_active ? "Published" : "Draft"}</span></div>
               <h3>{item.title}</h3>
               <p>{item.body}</p>
-              <div className="announcement-item-footer"><span><Clock3 size={12} aria-hidden="true" />{new Date(item.created_at).toLocaleDateString()}</span><form action={toggleAnnouncement}><input type="hidden" name="id" value={item.id} /><input type="hidden" name="active" value={String(!item.is_active)} /><button className="button" type="submit">{item.is_active ? "Unpublish" : "Publish"}</button></form></div>
+              <div className="announcement-item-footer"><span><Clock size={12} aria-hidden="true" />{new Date(item.created_at).toLocaleDateString()}</span><form action={toggleAnnouncement}><input type="hidden" name="id" value={item.id} /><input type="hidden" name="active" value={String(!item.is_active)} /><button className="button" type="submit">{item.is_active ? "Unpublish" : "Publish"}</button></form></div>
             </article>
           ))}
         </div>
