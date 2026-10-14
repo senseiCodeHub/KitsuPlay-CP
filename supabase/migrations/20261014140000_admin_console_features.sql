@@ -26,7 +26,7 @@ as $$
       and is_active = true
       and role in ('owner','admin','support')
   );
-$;
+$$;
 revoke all on function public.kitsuplay_is_admin() from public;
 grant execute on function public.kitsuplay_is_admin() to authenticated;
 
