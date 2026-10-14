@@ -125,7 +125,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
                   <td>{row.last_sign_in_at ? new Date(row.last_sign_in_at).toLocaleDateString() : "Never"}</td>
                   <td>{row.created_at ? new Date(row.created_at).toLocaleDateString() : "—"}</td>
                   <td><div className="table-actions">
-                    {banned
+                    {admin.role === "support" ? <span className="muted-small">Read only</span> : banned
                       ? <form action={setUserBan}><input type="hidden" name="user_id" value={id} /><input type="hidden" name="action" value="unban" /><button className="button" type="submit" disabled={isSelf}>Unban</button></form>
                       : <form action={setUserBan}><input type="hidden" name="user_id" value={id} /><input type="hidden" name="action" value="ban" /><button className="button danger" type="submit" disabled={isSelf}>Ban</button></form>}
                   </div></td>
