@@ -59,7 +59,7 @@ export async function grantAdminAccess(formData: FormData) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !["owner", "admin", "support"].includes(role)) redirect("/admins?error=invalid");
   let client: ReturnType<typeof createAdminClient>;
   try { client = createAdminClient(); } catch { redirect("/admins?error=config"); }
-  let match: { id: string; email?: string } | null = null;
+  let match: { id: string } | null = null;
   for (let page = 1; page <= 100; page++) {
     const result = await client.auth.admin.listUsers({ page, perPage: 100 });
     if (result.error) redirect("/admins?error=config");
