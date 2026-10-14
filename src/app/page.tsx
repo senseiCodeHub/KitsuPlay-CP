@@ -53,7 +53,10 @@ export default async function DashboardPage() {
             { title: "User management", desc: "Review member profiles, email verification, and account access.", href: "/users", icon: UsersRound, tag: "MEMBERS" },
             { title: "Announcements", desc: "Publish service updates and maintenance notices.", href: "/announcements", icon: BellRing, tag: "MESSAGING" },
             { title: "App settings", desc: "Configure maintenance mode and its user-facing message.", href: "/settings", icon: Activity, tag: "CONFIG" },
-            { title: "Audit log", desc: "Review administrative actions for accountability.", href: "/audit-log", icon: History, tag: "SECURITY" },\n            { title: "App analytics", desc: "Review live totals and recent registration trends.", href: "/analytics", icon: Activity, tag: "INSIGHTS" },\n            { title: "System health", desc: "Check database tables, Supabase Auth, and environment readiness.", href: "/system-health", icon: ShieldCheck, tag: "HEALTH" },\n            { title: "Admin access", desc: "Manage owner, admin, and support permissions.", href: "/admins", icon: UsersRound, tag: "ACCESS" },
+            { title: "Audit log", desc: "Review administrative actions for accountability.", href: "/audit-log", icon: History, tag: "SECURITY" },
+            { title: "App analytics", desc: "Review live totals and recent registration trends.", href: "/analytics", icon: Activity, tag: "INSIGHTS" },
+            { title: "System health", desc: "Check database tables, Supabase Auth, and environment readiness.", href: "/system-health", icon: ShieldCheck, tag: "HEALTH" },
+            { title: "Admin access", desc: "Manage owner, admin, and support permissions.", href: "/admins", icon: UsersRound, tag: "ACCESS" },
           ].map(({ title, desc, href, icon: Icon, tag }) => (
             <Link className="workspace-link" href={href} key={href}>
               <span className="workspace-icon"><Icon size={17} strokeWidth={1.8} aria-hidden="true" /></span>
