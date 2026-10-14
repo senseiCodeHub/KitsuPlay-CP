@@ -1,0 +1,7 @@
+import Link from "next/link";
+import { requireAdmin } from "@/lib/auth/admin";
+export const dynamic="force-dynamic";
+export default async function AuditLogPage(){
+ const {supabase}=await requireAdmin();const {data,error}=await supabase.from("admin_audit_log").select("id,actor_id,action,target_type,target_id,created_at").order("created_at",{ascending:false}).limit(100);
+ return <div className="shell"><aside className="sidebar"><Link className="brand" href="/"><span className="brand-mark">K</span>KitsuPlay CP</Link><nav className="nav"><Link href="/">Overview</Link><Link href="/users">Users</Link><Link href="/announcements">Announcements</Link><Link href="/settings">App settings</Link><Link className="active" href="/audit-log">Audit log</Link></nav></aside><main className="main"><div className="topbar"><div><div className="eyebrow">Security</div><h1>Audit log</h1><p className="subtle">Latest administrative actions, newest first.</p></div><Link className="button" href="/">Dashboard</Link></div><section className="panel"><div className="table-wrap"><table><thead><tr><th>Action</th><th>Target</th><th>Admin ID</th><th>Time</th></tr></thead><tbody>{error?<tr><td colSpan={4}>Audit log table unavailable. Apply migration.</td></tr>:!data?.length?<tr><td colSpan={4}>No actions recorded yet.</td></tr>:data.map(row=><tr key={row.id}><td>{row.action}</td><td>{row.target_type??"—"} {row.target_id??""}</td><td>{row.actor_id??"System"}</td><td>{new Date(row.created_at).toLocaleString()}</td></tr>)}</tbody></table></div></section></main></div>;
+}
