@@ -29,9 +29,20 @@ export default async function SystemHealthPage() {
   }));
   checks.push(...tableResults.map((item) => ({ title: "Database table: " + item.table, detail: item.detail, ok: item.ok, severity: "error" as const })));
   let authOk = false;
-  try { const client = createAdminClient(); const result = await client.auth.admin.listUsers({ page: 1, perPage: 1 }); authOk = !result.error; }
-  catch { authOk = false; }
+  let ownerConfigured = false;
+  let ownerCheckAvailable = false;
+  try {
+    const client = createAdminClient();
+    const [authResult, ownerResult] = await Promise.all([
+      client.auth.admin.listUsers({ page: 1, perPage: 1 }),
+      client.from("admin_users").select("user_id", { count: "exact", head: true }).eq("role", "owner").eq("is_active", true),
+    ]);
+    authOk = !authResult.error;
+    ownerCheckAvailable = !ownerResult.error;
+    ownerConfigured = !ownerResult.error && (ownerResult.count ?? 0) > 0;
+  } catch { authOk = false; }
   checks.push({ title: "Supabase Auth Admin API", detail: authOk ? "Admin API responded successfully." : "Could not verify Auth Admin API. Check the server secret and Supabase Auth service.", ok: authOk, severity: "warning" });
+  checks.push({ title: "Owner access bootstrap", detail: !ownerCheckAvailable ? "Could not inspect administrator roles; check SUPABASE_SECRET_KEY." : ownerConfigured ? "At least one active owner is configured." : "No active owner role exists. An existing trusted administrator must be promoted through a reviewed one-time SQL operation before owner-only role management is available.", ok: ownerConfigured, severity: "warning" });
   const healthy = checks.filter((item) => item.ok).length;
   return <AdminShell active="system-health">
     <header className="topbar"><div><div className="eyebrow">Operations / Diagnostics</div><h1>System health</h1><p className="subtle">Read-only checks for configuration, database tables, and Supabase Auth.</p></div><Link className="button" href="/"><ArrowLeft size={14} /> Overview</Link></header>
