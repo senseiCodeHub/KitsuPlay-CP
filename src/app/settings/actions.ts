@@ -32,7 +32,7 @@ export async function saveAppUpdateSettings(formData: FormData) {
   let parsedUrl: URL;
   try { parsedUrl = new URL(updateUrl); } catch { redirect("/settings?error=update_invalid"); }
   if (
-    !/^\\d+(?:\\.\\d+){1,3}(?:[-+][0-9A-Za-z.-]+)?$/.test(latestVersion) ||
+    !/^\d+(?:\.\d+){1,3}(?:[-+][0-9A-Za-z.-]+)?$/.test(latestVersion) ||
     !Number.isSafeInteger(versionCode) || versionCode < 1 || versionCode > 2147483647 ||
     !title || !message || parsedUrl!.protocol !== "https:" || parsedUrl!.username || parsedUrl!.password
   ) redirect("/settings?error=update_invalid");
