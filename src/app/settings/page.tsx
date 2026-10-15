@@ -6,7 +6,7 @@ import { saveSettings, saveAppUpdateSettings } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string }> }) {
+export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string; update_saved?: string }> }) {
   const { supabase, admin } = await requireAdmin();
   const params = await searchParams;
   const { data, error } = await supabase.from("app_settings").select("key,value").eq("key", "maintenance_mode").maybeSingle();
@@ -22,7 +22,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       </header>
 
       {(error || updateError) && <div className="notice page-notice" role="alert">Some settings could not be loaded. Check the Supabase configuration and policies.</div>}
-      {params.error && <div className="notice page-notice" role="alert">Settings could not be saved. Check the database policy and try again.</div>}
+      {params.error && <div className="notice page-notice" role="alert">{params.error === "update_invalid" ? "Check the version, version code, title, message, and valid HTTPS update link." : "Settings could not be saved. Check the database policy and try again."}</div>}
+      {params.update_saved && <div className="success-banner"><span className="dot" /> App update settings saved successfully.</div>}
       {params.saved && <div className="success-banner"><span className="dot" /> Settings saved successfully.</div>}
 
       <section className="settings-layout">
