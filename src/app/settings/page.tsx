@@ -99,8 +99,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               <span className={update?.force_update ? "mode-status mode-on" : "mode-status"}>{update?.force_update ? "Required" : "Optional"}</span>
             </label>
             <label className="label">Download / update URL<input className="field" name="download_url" type="url" inputMode="url" maxLength={2048} placeholder="https://play.google.com/store/apps/details?id=..." defaultValue={update?.download_url ?? ""} required /></label>
-            <label className="label">Publish from (optional)<input className="field" name="starts_at" type="datetime-local" defaultValue={toDateTimeLocal(update?.starts_at)} /></label>
-            <label className="label">Publish until (optional)<input className="field" name="ends_at" type="datetime-local" defaultValue={toDateTimeLocal(update?.ends_at)} /></label>
+            <label className="label">Publish from (UTC, optional)<input className="field" name="starts_at" type="datetime-local" defaultValue={toDateTimeLocal(update?.starts_at)} /></label>
+            <label className="label">Publish until (UTC, optional)<input className="field" name="ends_at" type="datetime-local" defaultValue={toDateTimeLocal(update?.ends_at)} /></label>
             <div className="form-help">The public API only returns active releases whose schedule includes the current time. Use a trusted HTTPS link. If no schedule is set, the release is available immediately while active.</div>
             <button className="button primary submit-wide" type="submit"><Save size={14} aria-hidden="true" /> Save release</button>
           </form>}
