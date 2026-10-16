@@ -3,12 +3,10 @@ export default function Loading() {
     <div className="shell" aria-busy="true" aria-label="Loading control panel">
       <aside className="sidebar skeleton-sidebar">
         <div className="skeleton skeleton-brand" />
-        <div className="skeleton-nav">
-          <div className="skeleton skeleton-nav-item" />
-          <div className="skeleton skeleton-nav-item" />
-          <div className="skeleton skeleton-nav-item" />
-          <div className="skeleton skeleton-nav-item" />
-          <div className="skeleton skeleton-nav-item" />
+        <div className="skeleton-nav" aria-hidden="true">
+          {Array.from({ length: 8 }, (_, index) => (
+            <div className="skeleton skeleton-nav-item" key={index} />
+          ))}
         </div>
         <div className="skeleton skeleton-sidebar-note" />
       </aside>
